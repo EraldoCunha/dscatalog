@@ -1,5 +1,6 @@
 package com.devsuperior.dscatalog.entities;
 
+import com.devsuperior.dscatalog.projections.IdProjection;
 import jakarta.persistence.*;
 
 import java.io.Serial;
@@ -11,9 +12,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "tb_product")
-public class Product implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
+public class Product implements IdProjection<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,6 +45,7 @@ public class Product implements Serializable {
         this.date = date;
     }
 
+    @Override
     public Long getId() {
         return id;
     }
