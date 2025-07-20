@@ -1,5 +1,7 @@
 package com.devsuperior.dscatalog.config;
 
+import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -15,12 +17,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-
-import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -32,18 +33,23 @@ public class ResourceServerConfig {
 
 	@Bean
 	@Profile("test")
-	@Order(1)
-	public SecurityFilterChain h2SecurityFilterChain(HttpSecurity http) throws Exception {
+	@Order(0)
+	SecurityFilterChain h2SecurityFilterChain(HttpSecurity http) throws Exception {
+		http.securityMatcher(PathRequest.toH2Console()).csrf(csrf -> csrf.disable());
+		http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
+		return http.build();
+	}
 
-		http.securityMatcher(PathRequest.toH2Console()).csrf(csrf -> csrf.disable())
-				.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
+	@Bean
+	@Order(1)
+	SecurityFilterChain csrfSecurityFilterChain(HttpSecurity http) throws Exception {
+		http.securityMatcher(new AntPathRequestMatcher("/users", "POST")).csrf(csrf -> csrf.disable());
 		return http.build();
 	}
 
 	@Bean
 	@Order(3)
-	public SecurityFilterChain rsSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
-		HttpSecurity http = httpSecurity.securityMatcher("/**");
+	SecurityFilterChain rsSecurityFilterChain(HttpSecurity http) throws Exception {
 		http.csrf(csrf -> csrf.disable());
 		http.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
 		http.oauth2ResourceServer(oauth2ResourceServer -> oauth2ResourceServer.jwt(Customizer.withDefaults()));
@@ -52,7 +58,7 @@ public class ResourceServerConfig {
 	}
 
 	@Bean
-	public JwtAuthenticationConverter jwtAuthenticationConverter() {
+	JwtAuthenticationConverter jwtAuthenticationConverter() {
 		JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
 		grantedAuthoritiesConverter.setAuthoritiesClaimName("authorities");
 		grantedAuthoritiesConverter.setAuthorityPrefix("");
