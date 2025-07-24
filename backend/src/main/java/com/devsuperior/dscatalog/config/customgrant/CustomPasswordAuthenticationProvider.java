@@ -38,8 +38,8 @@ public class CustomPasswordAuthenticationProvider implements AuthenticationProvi
 	private Set<String> authorizedScopes = new HashSet<>();
 
 	public CustomPasswordAuthenticationProvider(OAuth2AuthorizationService authorizationService,
-			OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator, 
-			UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+                                                OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator,
+                                                UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
 		
 		Assert.notNull(authorizationService, "authorizationService cannot be null");
 		Assert.notNull(tokenGenerator, "TokenGenerator cannot be null");
