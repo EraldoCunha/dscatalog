@@ -1,6 +1,7 @@
 package com.devsuperior.dscatalog.resources.exceptions;
 
 import com.devsuperior.dscatalog.services.exception.DatabaseException;
+import com.devsuperior.dscatalog.services.exception.EmailException;
 import com.devsuperior.dscatalog.services.exception.ResourceNotFoundException;
 import com.devsuperior.dscatalog.services.exception.ValidationError;
 import jakarta.servlet.http.HttpServletRequest;
@@ -57,4 +58,15 @@ public class ResourceExceptionHandler {
         return ResponseEntity.status(status).body(err);
     }
 
+    @ExceptionHandler(EmailException.class)
+    public ResponseEntity<StandardError> email(EmailException e, HttpServletRequest request){
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError err = new StandardError();
+        err.setTimestamp(Instant.now());
+        err.setStatus(status.value());
+        err.setError("Email exception");
+        err.setMessage(e.getMessage());
+        err.setPath(request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
 }

@@ -29,10 +29,17 @@ public class UserResource {
         return ResponseEntity.ok().body(list);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @GetMapping(value = "/{id}")
     public ResponseEntity<UserDTO> findById(@PathVariable Long id) {
         UserDTO dto = service.findById(id);
+        return ResponseEntity.ok().body(dto);
+    }
+
+    @PreAuthorize("hasAnyRole('ROLE_OPERATOR', 'ROLE_ADMIN')")
+    @GetMapping(value = "/me")
+    public ResponseEntity<UserDTO> findMe() {
+        UserDTO dto = service.findMe();
         return ResponseEntity.ok().body(dto);
     }
 
